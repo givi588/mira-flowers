@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://givi588.github.io/mira-flowers/sitemap.xml
