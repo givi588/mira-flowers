@@ -2,7 +2,7 @@
 
 A responsive, Georgian-language storefront for **Mira Flowers**, a flower shop in Kutaisi, Georgia. Built with HTML, CSS, and vanilla JavaScript; hosted on GitHub Pages.
 
-**[Visit the live website](https://givi588.github.io/mira-flowers/)** · [Official Facebook page](https://www.facebook.com/profile.php?id=61595825237820)
+**[Visit the live website](https://givi588.github.io/mira-flowers/)** · [Official Facebook page](https://www.facebook.com/profile.php?id=61595825237820) · [Read the case study](docs/CASE_STUDY.md)
 
 ## What visitors can do
 
