@@ -32,7 +32,16 @@ function renderProducts(filter='all') {
   $('#product-grid').innerHTML = PRODUCTS.filter(p => filter === 'all' || p.category === filter).map(p => `
     <article class="product-card">
       <div class="product-image-wrap"><img src="assets/${p.image}" alt="${p.alt}" width="600" height="820" loading="lazy"><span class="product-type">${p.category === 'gift' ? 'კომპოზიცია' : 'თაიგული'}</span></div>
-      <div class="product-info"><div><h3>${p.name}</h3><p class="product-price">${formatGel(PRODUCT_PRICES[p.id])}</p><p class="product-photo-note">საილუსტრაციო ფოტო</p></div><button class="add-product" type="button" data-add="${p.id}" aria-label="${p.name} — კალათაში დამატება">+ დამატება</button></div>
+      <div class="product-info">
+        <div class="product-details">
+          <h3>${p.name}</h3>
+          <p class="product-price">${formatGel(PRODUCT_PRICES[p.id])}</p>
+          <p class="product-photo-note">საილუსტრაციო ფოტო</p>
+        </div>
+        <button class="add-product" type="button" data-add="${p.id}" aria-label="${p.name} — კალათაში დამატება">
+          <span aria-hidden="true">+</span> კალათაში
+        </button>
+      </div>
     </article>`).join('');
 }
 function addProduct(id) {
