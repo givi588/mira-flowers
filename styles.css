@@ -197,3 +197,5 @@
   .delivery-inner { grid-template-columns: minmax(0, 1fr); gap: 22px; }
   .contact-actions .button-primary { width: 100%; }
 }
+
+.product-description { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }

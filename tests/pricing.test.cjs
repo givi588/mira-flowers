@@ -60,3 +60,12 @@ test('product prices are positive integer tetri', () => {
     assert.ok(Number.isSafeInteger(amount) && amount > 0);
   }
 });
+
+test('budget bouquets use their listed prices with each delivery method', () => {
+  assert.equal(formatGel(PRODUCT_PRICES['mini-bouquet']), '5 ₾');
+  assert.equal(formatGel(PRODUCT_PRICES['simple-bouquet']), '10 ₾');
+  const items = [{ id: 'mini-bouquet', qty: 2 }, { id: 'simple-bouquet', qty: 1 }];
+  for (const [zone, fee] of [['pickup', 0], ['kutaisi', 199], ['nearby', 999]]) {
+    assert.deepEqual(calculateCart(items, zone), { count: 3, subtotal: 2000, fee, total: 2000 + fee });
+  }
+});
