@@ -82,7 +82,7 @@
     <section id="catalog" class="section catalog-section" aria-labelledby="catalog-heading">
       <div class="container">
         <div class="section-head">
-          <div><div class="eyebrow">ჩვენი კოლექცია</div><h2 id="catalog-heading">ყვავილები, რომლებიც<br><em>გამორჩეულად</em> გაგახარებს</h2></div>
+          <div><div class="eyebrow">ჩვენი კოლექცია</div><h2 id="catalog-heading" tabindex="-1">ყვავილები, რომლებიც<br><em>გამორჩეულად</em> გაგახარებს</h2></div>
           <p>მზა თაიგულები და საჩუქრის კომპოზიციები. აირჩიე სასურველი ვარიანტი და დაამატე კალათაში.</p>
         </div>
         <div class="filters" role="group" aria-label="კატალოგის ფილტრი">
@@ -168,10 +168,27 @@
     <div class="cart-header"><div><span class="eyebrow">შენი არჩევანი</span><h2 id="cart-heading">ჩემი კალათა</h2></div><button type="button" id="close-cart" class="close-cart" aria-label="კალათის დახურვა">×</button></div>
     <div class="cart-scroll">
       <div id="cart-items" aria-live="polite"></div>
-      <fieldset class="delivery-picker"><legend>როგორ გსურს შეკვეთის მიღება?</legend><label><input type="radio" name="delivery" value="pickup" checked><span>მაღაზიიდან გატანა</span><strong>0 ₾</strong></label><label><input type="radio" name="delivery" value="kutaisi"><span>ქუთაისში მიტანა</span><strong>1.99 ₾</strong></label><label><input type="radio" name="delivery" value="nearby"><span>ახლომდებარე დასახლებებში</span><strong>9.99 ₾</strong></label></fieldset>
-      <p class="cart-notice">მიტანის ზუსტ მისამართსა და ხელმისაწვდომობას Facebook-ით ან ტელეფონით გადაამოწმებთ. საიტზე გადახდა არ ხდება. კალათა ინახება მხოლოდ შენს მოწყობილობაზე.</p>
+      <div id="empty-cart" hidden>
+        <p class="empty-cart">კალათა ცარიელია. დაათვალიერე თაიგულები და აირჩიე სასურველი.</p>
+        <a id="browse-catalog" href="#catalog" class="button button-outline">დაათვალიერე თაიგულები</a>
+      </div>
+      <div id="cart-details" hidden>
+        <fieldset class="delivery-picker"><legend>როგორ გსურს შეკვეთის მიღება?</legend><label><input type="radio" name="delivery" value="pickup" checked><span>მაღაზიიდან გატანა</span><strong>0 ₾</strong></label><label><input type="radio" name="delivery" value="kutaisi"><span>ქუთაისში მიტანა</span><strong>1.99 ₾</strong></label><label><input type="radio" name="delivery" value="nearby"><span>ახლომდებარე დასახლებებში</span><strong>9.99 ₾</strong></label></fieldset>
+        <p class="cart-notice">მიტანის ზუსტ მისამართსა და ხელმისაწვდომობას Facebook-ით ან ტელეფონით გადაამოწმებთ. საიტზე გადახდა არ ხდება. კალათა ინახება მხოლოდ შენს მოწყობილობაზე.</p>
+        <details id="order-preview">
+          <summary>შეკვეთის ტექსტი (გადასაგზავნად)</summary>
+          <pre id="order-summary" tabindex="-1"></pre>
+        </details>
+      </div>
     </div>
-    <div class="cart-footer"><div class="total-row"><span>პროდუქტები</span><strong id="cart-subtotal">0 ₾</strong></div><div class="total-row"><span>მიტანა</span><strong id="cart-delivery">0 ₾</strong></div><div class="total-row cart-grand"><span>სულ</span><strong id="cart-total">0 ₾</strong></div><label class="summary-label" for="order-summary">შეკვეთის ტექსტი (გადასაგზავნად)</label><textarea id="order-summary" rows="3" readonly></textarea><button id="copy-order" type="button" class="button button-primary full-width" disabled>1. შეკვეთის ტექსტის კოპირება</button><a id="facebook-checkout" target="_blank" rel="noopener noreferrer" class="button button-outline full-width" aria-disabled="true" tabindex="-1">2. Facebook გვერდის გახსნა ↗</a><p id="cart-status" class="cart-status" role="status" aria-live="polite">დააკოპირე შეკვეთა, შემდეგ გახსენი Facebook და ჩასვი ტექსტი შეტყობინებაში. შეკვეთა ავტომატურად არ იგზავნება.</p></div>
+    <div id="cart-footer" class="cart-footer" hidden>
+      <div class="total-row"><span>პროდუქტები</span><strong id="cart-subtotal">0 ₾</strong></div>
+      <div class="total-row"><span>მიტანა</span><strong id="cart-delivery">0 ₾</strong></div>
+      <div class="total-row cart-grand"><span>სულ</span><strong id="cart-total">0 ₾</strong></div>
+      <button id="copy-order" type="button" class="button button-primary full-width" disabled>1. შეკვეთის ტექსტის კოპირება</button>
+      <a id="facebook-checkout" target="_blank" rel="noopener noreferrer" class="button button-outline full-width" aria-disabled="true" tabindex="-1">2. Facebook გვერდის გახსნა ↗</a>
+      <p id="cart-status" class="cart-status" role="status" aria-live="polite">დააკოპირე შეკვეთა, შემდეგ გახსენი Facebook და ჩასვი ტექსტი შეტყობინებაში. შეკვეთა ავტომატურად არ იგზავნება.</p>
+    </div>
   </aside>
 </body>
 </html>
