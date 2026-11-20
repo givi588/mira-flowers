@@ -14,6 +14,8 @@ let cart = loadCart();
 let delivery = 'pickup';
 let priorFocus = null;
 let toastTimer = null;
+let copyRequest = 0;
+let defaultCartStatus;
 const $ = (sel) => document.querySelector(sel);
 function loadCart() {
   try {
@@ -38,16 +40,41 @@ function addProduct(id) {
   const item = cart.find(item => item.id === id);
   if (item) { if (item.qty >= 20) { updateStatus('ერთი პროდუქტის მაქსიმალური რაოდენობაა 20.'); openCart(); return; } item.qty++; }
   else cart.push({id, qty:1});
-  saveCart(); renderCart();
+  cartChanged();
   showToast(`${productById(id).name} დაემატა კალათას.`);
 }
-function updateQty(id, delta) {
-  const item=cart.find(i => i.id===id); if (!item) return;
-  const next = item.qty + delta;
-  if (next <= 0) cart=cart.filter(i => i.id!==id);
-  else if (next<=20) item.qty=next;
-  else updateStatus('ერთი პროდუქტის მაქსიმალური რაოდენობაა 20.');
-  saveCart();renderCart();
+function updateQty(button) {
+  const { qty: id, delta } = button.dataset;
+  const index = cart.findIndex(item => item.id === id);
+  if (index === -1) return;
+  const item = cart[index];
+  const next = item.qty + Number(delta);
+  if (next > 20) {
+    updateStatus('ერთი პროდუქტის მაქსიმალური რაოდენობაა 20.');
+    return;
+  }
+
+  const restoreFocus = document.activeElement === button;
+  if (next === 0) cart.splice(index, 1);
+  else item.qty = next;
+  cartChanged();
+
+  if (restoreFocus) {
+    const replacement = cart[Math.min(index, cart.length - 1)];
+    const target = replacement
+      ? document.querySelector(`[data-qty="${replacement.id}"][data-delta="${delta}"]`)
+      : $('#browse-catalog');
+    target.focus();
+  }
+}
+function cartChanged() {
+  saveCart();
+  invalidateCopy();
+  renderCart();
+}
+function invalidateCopy() {
+  copyRequest++;
+  updateStatus(defaultCartStatus);
 }
 function orderText() {
   if (!cart.length) return '';
@@ -61,14 +88,19 @@ function renderCart(){
   $('#mobile-cart').hidden = result.count === 0;
   $('#mobile-cart-count').textContent = String(result.count);
   $('#mobile-cart-total').textContent = formatGel(result.subtotal);
-  $('#cart-items').innerHTML=cart.length ? cart.map(i=>{
+  const empty = cart.length === 0;
+  $('#empty-cart').hidden = !empty;
+  $('#cart-details').hidden = empty;
+  $('#cart-footer').hidden = empty;
+  if (empty) $('#order-preview').open = false;
+  $('#cart-items').innerHTML=cart.map(i=>{
     const p=productById(i.id);
     return `<div class="cart-item"><img src="assets/${p.image}" alt="" width="80" height="90"><div class="cart-item-main"><strong>${p.name}</strong><span>${formatGel(PRODUCT_PRICES[i.id]*i.qty)}</span><div class="quantity"><button type="button" data-qty="${p.id}" data-delta="-1" aria-label="${p.name} რაოდენობის შემცირება">−</button><output>${i.qty}</output><button type="button" data-qty="${p.id}" data-delta="1" aria-label="${p.name} რაოდენობის გაზრდა">+</button></div></div></div>`;
-  }).join('') : '<p class="empty-cart">კალათა ცარიელია. დაათვალიერე თაიგულები და აირჩიე სასურველი.</p>';
+  }).join('');
   $('#cart-subtotal').textContent=formatGel(result.subtotal);
   $('#cart-delivery').textContent=formatGel(result.fee);
   $('#cart-total').textContent=formatGel(result.total);
-  $('#order-summary').value=orderText();
+  $('#order-summary').textContent=orderText();
   $('#copy-order').disabled=!cart.length;
   const fbCheckout = $('#facebook-checkout');
   fbCheckout.setAttribute('aria-disabled', String(!cart.length));
@@ -107,26 +139,46 @@ function openCart() {
   setBackgroundInert(true);
   $('#close-cart').focus();
 }
-function closeCart(){
+function closeCart(restoreFocus = true){
+  copyRequest++;
   $('#cart-panel').hidden=true; $('#cart-backdrop').hidden=true;
   document.body.classList.remove('cart-open');
   setBackgroundInert(false);
+  if (!restoreFocus) return;
   if (priorFocus && priorFocus.isConnected && !priorFocus.hidden && priorFocus.getClientRects().length) priorFocus.focus();
   else $('#open-cart').focus();
 }
+function selectOrderSummary() {
+  $('#order-preview').open = true;
+  const summary = $('#order-summary');
+  summary.focus();
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(summary);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
 async function copyOrder() {
   if (!cart.length) return;
-  const text=orderText();
+  const request = ++copyRequest;
+  const text = orderText();
   try {
     if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
-    else { $('#order-summary').focus();$('#order-summary').select(); if (!document.execCommand('copy')) throw new Error('Copy failed'); }
-    updateStatus('შეკვეთის ტექსტი დაკოპირებულია. გახსენი Facebook და ჩასვი შეტყობინებაში.');
-  } catch { $('#order-summary').focus();$('#order-summary').select();updateStatus('ავტომატური კოპირება ვერ მოხერხდა. მონიშნული ტექსტი დააკოპირე Ctrl+C-ით.'); }
+    else {
+      selectOrderSummary();
+      if (!document.execCommand('copy')) throw new Error('Copy failed');
+    }
+    if (request === copyRequest) updateStatus('შეკვეთის ტექსტი დაკოპირებულია. გახსენი Facebook და ჩასვი შეტყობინებაში.');
+  } catch {
+    if (request !== copyRequest) return;
+    selectOrderSummary();
+    updateStatus('ავტომატური კოპირება ვერ მოხერხდა. მონიშნული ტექსტი ხელით დააკოპირე.');
+  }
 }
 function trapFocus(event) {
   if (event.key === 'Escape') {closeCart();return;}
   if (event.key !== 'Tab') return;
-  const focusable = Array.from($('#cart-panel').querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled)')).filter(el => el.getClientRects().length > 0);
+  const focusable = Array.from($('#cart-panel').querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), summary')).filter(el => el.getClientRects().length > 0);
   if (!focusable.length) return;
   const first=focusable[0],last=focusable[focusable.length-1];
   if (event.shiftKey && document.activeElement===first) {event.preventDefault();last.focus();}
@@ -134,6 +186,7 @@ function trapFocus(event) {
 }
 document.addEventListener('DOMContentLoaded',()=>{
   $('#current-year').textContent=String(new Date().getFullYear());
+  defaultCartStatus = $('#cart-status').textContent;
   renderProducts();renderCart();
   $('#product-grid').addEventListener('click',(event)=>{const btn=event.target.closest('[data-add]');if(btn) addProduct(btn.dataset.add);});
   document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{
@@ -152,11 +205,18 @@ document.addEventListener('DOMContentLoaded',()=>{
     if($('#menu-toggle').getAttribute('aria-expanded')==='true' && !event.target.closest('#main-nav, #menu-toggle'))setMenu(false);
   });
   window.addEventListener('resize',()=>{if(window.innerWidth>780)setMenu(false);});
-  $('#close-cart').addEventListener('click',closeCart);
+  $('#close-cart').addEventListener('click',()=>closeCart());
   $('#cart-backdrop').addEventListener('click',closeCart);
   $('#cart-panel').addEventListener('keydown',trapFocus);
-  $('#cart-items').addEventListener('click',(event)=>{const btn=event.target.closest('[data-qty]');if(btn)updateQty(btn.dataset.qty,Number(btn.dataset.delta));});
-  document.querySelectorAll('input[name="delivery"]').forEach(input=>input.addEventListener('change',()=>{if(input.checked){delivery=input.value;renderCart();}}));
+  $('#cart-items').addEventListener('click',(event)=>{const btn=event.target.closest('[data-qty]');if(btn)updateQty(btn);});
+  document.querySelectorAll('input[name="delivery"]').forEach(input=>input.addEventListener('change',()=>{if(input.checked){delivery=input.value;invalidateCopy();renderCart();}}));
+  $('#browse-catalog').addEventListener('click', event => {
+    event.preventDefault();
+    closeCart(false);
+    if (window.location.hash !== '#catalog') window.history.pushState(null, '', '#catalog');
+    $('#catalog-heading').focus({preventScroll:true});
+    $('#catalog').scrollIntoView();
+  });
   $('#copy-order').addEventListener('click',copyOrder);
   $('#facebook-checkout').addEventListener('click',(event)=>{if (!cart.length){event.preventDefault();updateStatus('ჯერ დაამატე თაიგული კალათაში.');}else updateStatus('შეკვეთის ტექსტი დააკოპირე და ჩასვი Facebook-ზე — შეტყობინება ავტომატურად არ იგზავნება.');});
 });
