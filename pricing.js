@@ -6,7 +6,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const DELIVERY_FEES = Object.freeze({ pickup: 0, kutaisi: 199, nearby: 999 });
-  const PRODUCT_PRICES = Object.freeze({ sunflower: 1500, mix: 2000, pink: 2500, teddy: 7000, lilac: 2500, pinkmini: 3000 });
+  const PRODUCT_PRICES = Object.freeze({ 'mini-bouquet': 500, 'simple-bouquet': 1000, sunflower: 1500, mix: 2000, pink: 2500, teddy: 7000, lilac: 2500, pinkmini: 3000 });
   function calculateCart(items, delivery) {
     if (!Object.prototype.hasOwnProperty.call(DELIVERY_FEES, delivery)) throw new Error('Unknown delivery zone');
     if (!Array.isArray(items)) throw new Error('Invalid cart');

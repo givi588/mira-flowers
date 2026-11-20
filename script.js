@@ -1,5 +1,7 @@
 'use strict';
 const PRODUCTS = Object.freeze([
+  { id:'mini-bouquet', name:'მინი თაიგული', category:'bouquet', image:'mini-bouquet-5gel.webp', alt:'მინი თაიგულის საილუსტრაციო ფოტო', description:'ყოველდღიური ბიუჯეტური თაიგული.' },
+  { id:'simple-bouquet', name:'მარტივი თაიგული', category:'bouquet', image:'simple-bouquet-10gel.webp', alt:'მარტივი თაიგულის საილუსტრაციო ფოტო', description:'ხელმისაწვდომი თაიგული ყოველდღიური შეკვეთისთვის.' },
   { id:'sunflower', name:'მზესუმზირის თაიგული', category:'bouquet', image:'sunflower-bouquet.webp', alt:'ერთი მზესუმზირის თაიგული თბილ შეფუთვაში' },
   { id:'mix', name:'ფერადი მიქს-თაიგული', category:'bouquet', image:'colorful-bouquet.webp', alt:'ვარდების, ჰორტენზიებისა და ლილიების შერეული თაიგული — საილუსტრაციო ფოტო' },
   { id:'pink', name:'ნაზი ვარდისფერი თაიგული', category:'bouquet', image:'pink-bouquet.webp', alt:'ვარდისფერი და თეთრი ეუსტომების თაიგული თეთრ ფონზე — საილუსტრაციო ფოტო' },
@@ -36,6 +38,7 @@ function renderProducts(filter='all') {
         <div class="product-details">
           <h3>${p.name}</h3>
           <p class="product-price">${formatGel(PRODUCT_PRICES[p.id])}</p>
+          ${p.description ? `<p class="product-description">${p.description}</p>` : ''}
           <p class="product-photo-note">საილუსტრაციო ფოტო</p>
         </div>
         <button class="add-product" type="button" data-add="${p.id}" aria-label="${p.name} — კალათაში დამატება">
